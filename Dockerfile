@@ -1,9 +1,11 @@
-FROM node:20-slim
+FROM docker.io/python:3.11-slim
 WORKDIR /app
-COPY package*.json ./
-RUN npm install --production
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-EXPOSE 3000
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=production
+EXPOSE 5000
 RUN useradd -m appuser
 USER appuser
-CMD ["npm", "start"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
